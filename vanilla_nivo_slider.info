@@ -1,0 +1,4 @@
+name = VANILLA slider
+description = Provide easy way to create different kind of content sliders.
+core = 7.x
+package = VANILLA TOOLS

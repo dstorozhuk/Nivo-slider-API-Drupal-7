@@ -1,0 +1,270 @@
+<?php
+/**
+ * @file sorce for vanilla slider module
+ *
+ * @see vanilla_nivo_slider_test() to usage example
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function vanilla_nivo_slider_menu() {
+  $items = array();
+
+  $items['vanilla-nivo-slider-test'] = array(
+    'title' => 'vanilla_nivo_slider',
+    'description' => 'vanilla_nivo_slider_test',
+    'page callback' => 'vanilla_nivo_slider_test',
+    'access callback' => TRUE,
+    'menu_name' => 'Navigation',
+    'type' => MENU_NORMAL_ITEM
+  );
+
+  return $items;
+}
+
+/**
+ * Example page how to use vanilla_nivo_slider theme
+ * @return type
+ */
+function vanilla_nivo_slider_test() {
+  // load test data
+  $qids = variable_get('ai_home_page_carousel_qids', array());
+  module_load_include('inc', 'ai_home_page', 'includes/ai_home_page.blocks');
+  $items = ai_home_page_top_carousel_slider_block_content_data($qids['en']);
+  //  dpm($items);
+  // init vars
+  $captions = array();
+  $slider_items = array( );
+  foreach ($items as $item) {
+    // $slider_items can be either render array or html string
+    $item = (object) $item;
+    $title = $item->title;
+    // build images
+    $image = array(
+      '#theme' => 'image_style',
+      '#path' => $item->uri,
+      '#alt' => $title,
+      // associate slider item with caption item
+      '#title' => '#fid-' . $item->fid,
+      '#style_name' => '640w365h',
+    );
+    // wrapp immages to links
+    $slider_items[] = array(
+      '#type' => 'link',
+      '#href' => 'node/' . $item->nid,
+      '#alt' => $title,
+      '#title' => render($image),
+      '#options' => array(
+        //if link is image - this option always
+        'html' => TRUE
+      )
+    );
+   // caption item key will be a caption html element id attribute and value - content
+   //$captions['fid-' . $item->fid] = $item->title;
+   // also, caption can be an render array
+   $captions['fid-' . $item->fid]['main_content']['#theme'] = 'item_list';
+   $captions['fid-' . $item->fid]['main_content']['#items'] = array($item->title);
+   $captions['fid-' . $item->fid]['main_content']['#prefix'] = '<h3>';
+   $captions['fid-' . $item->fid]['main_content']['#suffix'] = '</h3>';
+      // add related_articles
+   $captions['fid-' . $item->fid]['related_articles'] = array(
+     '#theme' => 'item_list',
+     '#items' => array(
+       'Item 1',
+       'Item 2'
+       )
+    );
+  }
+
+  $options = array();
+  // add nivo slider settings
+  /**
+   * list of evaliable effcts:
+   * 'sliceDownRight',
+   * 'sliceDownLeft',
+   * 'sliceUpRight',
+   * 'sliceUpLeft',
+   * 'sliceUpDown',
+   * 'sliceUpDownLeft',
+   * 'fold',
+   * 'fade',
+   * 'boxRandom',
+   * 'boxRain',
+   * 'boxRainReverse',
+   * 'boxRainGrow',
+   * 'boxRainGrowReverse'
+   *
+   * @link http://dev7studios.com/nivo-slider/#/documentation some pore documentation
+   */
+  // you can customize all your slider inctances by passing a slider setting
+  $options['settings'] = array(
+    'effect' =>  "boxRainGrowReverse",
+  );
+  // also, you can use your own theme (copy from nivo-slider some theme and paste it to you module)
+  // you can chanege styles to your needs.
+  $options['theme']['css'] = 'sites/all/libraries/nivo-slider/themes/bar/bar.css';
+  // name option is required
+  $options['theme']['name'] = 'bar';
+
+  return array(
+    '#theme' => 'vanilla_nivo_slider',
+    '#items' => $slider_items,
+    '#captions' => $captions,
+    '#name' => 'test-slider',
+    '#options' => $options
+  );
+}
+
+/**
+ * Implements hook_theme().
+ */
+function vanilla_nivo_slider_theme($existing, $type, $theme, $path) {
+  return array(
+    'vanilla_nivo_slider' => array(
+      'template' => 'templates/vanilla-nivo-slider',
+      'variables' => array(
+        'items' => array(),
+        'captions' => array(),
+        'options' => array(),
+        'name' => NULL
+        ),
+    ),
+  );
+}
+
+/**
+ * Preprocess for vanilla_nivo_slider_wrapper theme.
+ */
+function template_preprocess_vanilla_nivo_slider(&$vars) {
+  $options  = $vars['options'];
+  $captions = $vars['captions'];
+
+  if (!isset($vars['name'])) {
+    throw new Exception('Name option can`t be empty.');
+  }
+
+  $name = $vars['name'];
+  $vars['classes_array'][0] = 'vanilla-nivo-slider-wrapper';
+  $vars['classes_array'][] = 'vanilla-nivo-slider-wrapper-' . $name;
+
+  // Apply the slidr theme
+  if (isset($options['theme'])) {
+
+    if (!isset($options['theme']['name'])) {
+      throw new Exception('Theme Name option can`t be empty.');
+    }
+    // add wrappers classes
+    if (isset($options['theme']['name']) && !empty($options['theme']['name'])) {
+      $vars['classes_array'][] = 'theme-' . $options['theme']['name'] ;
+      $vars['classes_array'][] = 'slider-wrapper';
+    }
+    if (isset($options['theme']['css'])) {
+      drupal_add_css($options['theme']['css']);
+    }
+    if (isset($options['theme']['js'])) {
+      drupal_add_css($options['theme']['js']);
+    }
+  }
+  // load default theme
+  else {
+    drupal_add_css('sites/all/libraries/nivo-slider/themes/default/default.css');
+  }
+
+  // load library
+  drupal_add_library('vanilla_nivo_slider', 'jquery.nivo.slider');
+  // add default settings
+  $default_settings = array(
+    'animSpeed' =>  500,
+    'captionOpacity' =>  1,
+    'controlNav' =>  TRUE,
+    'controlNavThumbs' =>  FALSE,
+    'directionNav' =>  TRUE,
+    'directionNavHide' =>  TRUE,
+    'effect' =>  "fade",
+    'manualAdvance' =>  FALSE,
+    'pauseOnHover' =>   FALSE,
+    'pauseTime' =>  5000,
+    'slices' =>  1,
+    'startSlide' =>  0,
+    'prevText' =>  t('Prev'), // Prev directionNav text
+    'nextText' =>  t('Next'), // Next directionNav text
+
+//    default nivo settings
+//    'effect' => 'fade', // Specify sets like =>  'fold,fade,sliceDown'
+//    'slices' =>  15, // For slice animations
+//    'boxCols' =>  8, // For box animations
+//    'boxRows' =>  4, // For box animations
+//    'animSpeed' =>  500, // Slide transition speed
+//    'pauseTime' =>  3000, // How long each slide will show
+//    'startSlide' =>  0, // Set starting Slide (0 index)
+//    'directionNav' =>  true, // Next & Prev navigation
+//    'controlNav' =>  true, // 1,2,3... navigation
+//    'controlNavThumbs' =>  false, // Use thumbnails for Control Nav
+//    'pauseOnHover' =>  true, // Stop animation while hovering
+//    'manualAdvance' =>  false, // Force manual transitions
+//    'prevText' =>  'Prev', // Prev directionNav text
+//    'nextText' =>  'Next', // Next directionNav text
+//    'randomStart' =>  false, // Start on a random slide
+//    'beforeChange' =>  function(){}, // Triggers before a slide transition
+//    'afterChange' =>  function(){}, // Triggers after a slide transition
+//    'slideshowEnd' =>  function(){}, // Triggers after all slides have been shown
+//    'lastSlide' =>  function(){}, // Triggers when last slide is shown
+//    'afterLoad' =>  function(){} // Triggers when slider has loaded
+  );
+  // add slider instance settings
+  $settings = $default_settings;
+  if (isset($options['settings']) && !empty($options['settings'])) {
+    $settings = array_merge($default_settings, $options['settings']);
+  }
+  $data = array('vanilla_nivo_slider' => array($name => $settings));
+  drupal_add_js($data, 'setting');
+
+  // prepare slider items
+  $items = $vars['items'];
+  // reset items variable
+  $vars['items'] = array();
+  foreach ($items as $item) {
+    if (is_array($item)) {
+      // expecst that the $item is a render array
+      $vars['items'][] = render($item);
+    }
+  }
+  if (isset($vars['captions']) && !empty($vars['captions'])) {
+    $captions   = $vars['captions'];
+    // reset captions variable
+    $vars['captions'] = array();
+    foreach ($captions as $id => $caption) {
+      // expects that the $item is a render array
+      if (is_array($caption)) {
+        $vars['captions'][$id] = render($caption);
+      }
+      elseif (is_string($caption)) {
+        $vars['captions'][$id] = $caption;
+      }
+    }
+  }
+
+  // run sliders
+  $module_path = drupal_get_path('module', 'vanilla_nivo_slider');
+  drupal_add_js($module_path . '/vanilla_nivo_slider.js');
+}
+
+/**
+ * Implements hook_library().
+ */
+function vanilla_nivo_slider_library() {
+  $libraries['jquery.nivo.slider'] = array(
+    'title' => 'jQuery Nivo Slider',
+    'website' => 'http://dev7studios.com/nivo-slider',
+    'version' => '3.1',
+    'js' => array(
+      'sites/all/libraries/nivo-slider/jquery.nivo.slider.pack.js' => array(),
+    ),
+    'css' => array(
+      'sites/all/libraries/nivo-slider/nivo-slider.css' => array(),
+    )
+  );
+
+  return $libraries;
+}
