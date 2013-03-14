@@ -1,0 +1,4 @@
+name = Nivo Slider API
+description = Provide easy way to create nivo sliders in your code.
+core = 7.x
+package = API

@@ -1,0 +1,341 @@
+<?php
+// $Id$
+
+
+/**
+ * @file sorce for nivo_slider_api module
+ *
+ * @see nivo_slider_api_test() for usage example
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function nivo_slider_api_menu() {
+  $items = array();
+  // @todo remove in non-dev version
+  $items['nivo-slider-api-test'] = array(
+    'title' => 'nivo_slider_api',
+    'description' => 'nivo_slider_api_test',
+    'page callback' => 'nivo_slider_api_test',
+    'access arguments' => array('administer site configuration'),
+    'menu_name' => 'Navigation',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}
+
+/**
+ * Example page how to use nivo_slider_api theme
+ *
+ * @todo remove in non-dev version
+ */
+function nivo_slider_api_test() {
+  // load test data
+  $field_name = 'field_image';
+  if (!field_info_field($field_name)) {
+    return t('There is no field with !name', array('!name' => $field_name));
+  }
+
+  $query = new EntityFieldQuery();
+  $query->entityCondition('entity_type', 'node');
+  $query->propertyCondition('status', 1);
+  $query->fieldCondition($field_name, 'fid', 'NULL', '!=');
+  $query->range(0, 15);
+
+  $result = $query->execute();
+  $nodes = array();
+  if (isset($result['node'])) {
+    $nids = array_keys($result['node']);
+    $nodes = node_load_multiple($nids);
+  }
+
+  // init vars
+  $captions = array();
+  $slider_items = array();
+  foreach ($nodes as $item) {
+    // $slider_items can be either render array or html string
+
+    $title = $item->title;
+    $image_field_items = field_get_items('node', $item, $field_name);
+    // build images
+    $image = array(
+      '#theme' => 'image_style',
+      '#path' => $image_field_items[0]['uri'],
+      '#alt' => $title,
+      // associate slider item with caption item
+      '#title' => '#nid-' . $item->nid,
+      '#style_name' => '640w380h_scale_and_crop',
+    );
+//
+    //$image = field_view_field('node', $item, $field_name);
+    // wrapp immages to links
+    $slider_items[] = array(
+      '#type' => 'link',
+      '#href' => 'node/' . $item->nid,
+      '#title' => render($image),
+      '#options' => array(
+        //if link is image - this option always TRUE
+        'attributes' => array('title' => $title),
+        'html' => TRUE
+      ),
+    );
+    // caption item key will be a caption html element id attribute and value - content
+    // Example; $captions['fid-' . $item->fid] = $item->title;
+    // also, caption can be a render array
+    $captions['nid-' . $item->nid]['main_content']['#theme'] = 'item_list';
+    $captions['nid-' . $item->nid]['main_content']['#items'] = array($item->title);
+    $captions['nid-' . $item->nid]['main_content']['#prefix'] = '<h3>';
+    $captions['nid-' . $item->nid]['main_content']['#suffix'] = '</h3>';
+
+    $captions['nid-' . $item->nid]['related_articles'] = array(
+      '#theme' => 'item_list',
+      '#items' => array(
+        'Item 1',
+        'Item 2',
+      ),
+    );
+  }
+
+  $options = array();
+  // add nivo slider settings
+
+  /**
+   * list of evaliable effcts:
+   * 'sliceDownRight',
+   * 'sliceDownLeft',
+   * 'sliceUpRight',
+   * 'sliceUpLeft',
+   * 'sliceUpDown',
+   * 'sliceUpDownLeft',
+   * 'fold',
+   * 'fade',
+   * 'boxRandom',
+   * 'boxRain',
+   * 'boxRainReverse',
+   * 'boxRainGrow',
+   * 'boxRainGrowReverse'
+   *
+   * @link http://dev7studios.com/nivo-slider/#/documentation some pore documentation
+   */
+  // you can customize all your slider inctances by passing a slider setting
+  $options['settings'] = array(
+    //'effect' => "boxRainGrowReverse",
+    'directionNav' => TRUE
+  );
+  // also, you can use your own theme (copy from nivo-slider some theme and paste it to you module)
+  // you can chanege styles to your own needs.
+  $theme_name = 'simplejstheme';
+  $module_name = 'nivo_slider_api';
+  $module_path = drupal_get_path('module', $module_name);
+  $options['theme']['css'] = "$module_path/themes/$theme_name/$theme_name.css";
+  $options['theme']['js'] = "$module_path/themes/$theme_name/$theme_name.js";
+  // name option is required
+  $options['theme']['name'] = $theme_name;
+
+  return array(
+    '#theme' => 'nivo_slider_api',
+    '#items' => $slider_items,
+    '#captions' => $captions,
+    // name of the slider. Must be unic.
+    '#name' => 'test-slider',
+    '#options' => $options,
+  );
+}
+
+/**
+ * Implements hook_theme().
+ */
+function nivo_slider_api_theme($existing, $type, $theme, $path) {
+  return array(
+    'nivo_slider_api' => array(
+      'template' => 'templates/nivo-slider',
+      'variables' => array(
+        'items' => array(),
+        'captions' => array(),
+        'options' => array(),
+        'name' => NULL,
+      ),
+    ),
+  );
+}
+
+/**
+ * Preprocess for nivo_slider_api_wrapper theme.
+ */
+function template_preprocess_nivo_slider_api(&$vars) {
+  $options = $vars['options'];
+  $captions = $vars['captions'];
+
+  if (!isset($vars['name'])) {
+    throw new Exception('Name option can`t be empty.');
+  }
+
+  $name = $vars['name'];
+  $vars['classes_array'][0] = 'nivo-slider-api-wrapper';
+  $vars['classes_array'][] = 'nivo-slider-api-wrapper-' . $name;
+
+  $default_settings = array();
+  // Apply the slidr theme
+  if (isset($options['theme'])) {
+
+    if (!isset($options['theme']['name'])) {
+      throw new Exception('Theme Name option can`t be empty.');
+    }
+    // add wrappers classes
+    if (isset($options['theme']['name']) && !empty($options['theme']['name'])) {
+      $vars['classes_array'][] = 'theme-' . $options['theme']['name'];
+      $vars['classes_array'][] = 'slider-wrapper';
+    }
+    if (isset($options['theme']['css'])) {
+      drupal_add_css($options['theme']['css']);
+    }
+    if (isset($options['theme']['js'])) {
+      // make theme name visible in js files
+      $default_settings['theme_name'] = $options['theme']['name'];
+      drupal_add_js($options['theme']['js'], array('scope' => 'footer'));
+    }
+  }
+  // load default theme
+  else {
+    drupal_add_css('sites/all/libraries/nivo-slider/themes/default/default.css');
+  }
+
+  // load library
+  drupal_add_library('nivo_slider_api', 'jquery.nivo.slider');
+  // add default settings
+  $default_settings += array(
+    'animSpeed' => 500,
+    'captionOpacity' => 1,
+    'controlNav' => TRUE,
+    'controlNavThumbs' => FALSE,
+    'directionNav' => TRUE,
+    'directionNavHide' => TRUE,
+    'effect' => "fade",
+    'manualAdvance' => FALSE,
+    'pauseOnHover' => FALSE,
+    'pauseTime' => 5000,
+    'slices' => 1,
+    'startSlide' => 0,
+    // Prev directionNav text
+    'prevText' => t('Prev'),
+    // Next directionNav text
+    'nextText' => t('Next'),
+    //    default nivo settings
+    // Specify sets like =>  'fold,fade,sliceDown'
+    //    'effect' => 'fade',
+    // For slice animations
+    //    'slices' =>  15,
+    // For box animations
+    //    'boxCols' =>  8,
+    // For box animations
+    //    'boxRows' =>  4,
+    // Slide transition speed
+    //    'animSpeed' =>  500,
+    // How long each slide will show
+    //    'pauseTime' =>  3000,
+    // Set starting Slide (0 index)
+    //    'startSlide' =>  0,
+    // Next & Prev navigation
+    //    'directionNav' =>  true,
+    // 1,2,3... navigation
+    //    'controlNav' =>  true,
+    // Use thumbnails for Control Nav
+    //    'controlNavThumbs' =>  false,
+    // Stop animation while hovering
+    //    'pauseOnHover' =>  true,
+    // Force manual transitions
+    //    'manualAdvance' =>  false,
+    // Prev directionNav text
+    //    'prevText' =>  'Prev',
+    // Next directionNav text
+    //    'nextText' =>  'Next',
+    // Start on a random slide
+    //    'randomStart' =>  false,
+    // Triggers before a slide transition
+    //    'beforeChange' =>  function(){},
+    // Triggers after a slide transition
+    //    'afterChange' =>  function(){},
+    // Triggers after all slides have been shown
+    //    'slideshowEnd' =>  function(){},
+    // Triggers when last slide is shown
+    //    'lastSlide' =>  function(){},
+    //    'afterLoad' =>  function(){} // Triggers when slider has loaded
+  );
+  // add slider instance settings
+  $settings = $default_settings;
+  if (isset($options['settings']) && !empty($options['settings'])) {
+    $settings = array_merge($default_settings, $options['settings']);
+  }
+  $data = array('nivo_slider_api' => array($name => $settings));
+  drupal_add_js($data, 'setting');
+
+  // prepare slider items
+  $items = $vars['items'];
+  // reset items variable
+  $vars['items'] = array();
+  foreach ($items as $item) {
+    if (is_array($item)) {
+      // expecst that the $item is a render array
+      $vars['items'][] = render($item);
+    }
+  }
+  if (isset($vars['captions']) && !empty($vars['captions'])) {
+    $captions = $vars['captions'];
+    // reset captions variable
+    $vars['captions'] = array();
+    foreach ($captions as $id => $caption) {
+      // expects that the $item is a render array
+      if (is_array($caption)) {
+        $vars['captions'][$id] = render($caption);
+      }
+      elseif (is_string($caption)) {
+        $vars['captions'][$id] = $caption;
+      }
+    }
+  }
+
+  // run sliders
+  $module_path = drupal_get_path('module', 'nivo_slider_api');
+  drupal_add_js($module_path . '/nivo_slider_api.js');
+}
+
+/**
+ * Implements hook_library().
+ */
+function nivo_slider_api_library() {
+  $libraries['jquery.nivo.slider'] = array(
+    'title' => 'jQuery Nivo Slider',
+    'website' => 'http://dev7studios.com/nivo-slider',
+    'version' => '3.1',
+    'js' => array(
+      'sites/all/libraries/nivo-slider/jquery.nivo.slider.pack.js' => array(),
+    ),
+    'css' => array(
+      'sites/all/libraries/nivo-slider/nivo-slider.css' => array(),
+    ),
+  );
+
+  return $libraries;
+}
+
+/**
+ * Implements hook_image_default_styles()
+ */
+function nivo_slider_api_image_default_styles() {
+  $styles = array();
+  $styles['640w380h_scale_and_crop'] = array(
+    'effects' => array(
+      array(
+        'name' => 'image_scale_and_crop',
+        'data' => array(
+          'width' => 640,
+          'height' => 380,
+        ),
+        'weight' => 0,
+      ),
+    ),
+  );
+  return $styles;
+}
