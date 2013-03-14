@@ -1,19 +1,20 @@
 <?php
-// $Id$
-
-
 /**
  * @file sorce for nivo_slider_api module
  *
+ * Nivo slider API theme - is a developer theme to easy construct and output
+ * the new nivo slider instance.
  * @see nivo_slider_api_test() for usage example
  */
 
+
 /**
  * Implements hook_menu().
+ *
+ * @todo remove in non-dev version
  */
 function nivo_slider_api_menu() {
   $items = array();
-  // @todo remove in non-dev version
   $items['nivo-slider-api-test'] = array(
     'title' => 'nivo_slider_api',
     'description' => 'nivo_slider_api_test',
@@ -32,7 +33,7 @@ function nivo_slider_api_menu() {
  * @todo remove in non-dev version
  */
 function nivo_slider_api_test() {
-  // load test data
+  // Load test data
   $field_name = 'field_image';
   if (!field_info_field($field_name)) {
     return t('There is no field with !name', array('!name' => $field_name));
@@ -51,7 +52,7 @@ function nivo_slider_api_test() {
     $nodes = node_load_multiple($nids);
   }
 
-  // init vars
+  // Init vars
   $captions = array();
   $slider_items = array();
   foreach ($nodes as $item) {
@@ -59,31 +60,29 @@ function nivo_slider_api_test() {
 
     $title = $item->title;
     $image_field_items = field_get_items('node', $item, $field_name);
-    // build images
+    // Build images
     $image = array(
       '#theme' => 'image_style',
       '#path' => $image_field_items[0]['uri'],
       '#alt' => $title,
-      // associate slider item with caption item
+      // Associate slider item with caption item
       '#title' => '#nid-' . $item->nid,
       '#style_name' => '640w380h_scale_and_crop',
     );
-//
-    //$image = field_view_field('node', $item, $field_name);
-    // wrapp immages to links
+    // Wrapp immages to links
     $slider_items[] = array(
       '#type' => 'link',
       '#href' => 'node/' . $item->nid,
       '#title' => render($image),
       '#options' => array(
-        //if link is image - this option always TRUE
+        // If link is image - this option always TRUE
         'attributes' => array('title' => $title),
         'html' => TRUE
       ),
     );
-    // caption item key will be a caption html element id attribute and value - content
+    // Caption item key will be a caption html element id attribute and value - content
     // Example; $captions['fid-' . $item->fid] = $item->title;
-    // also, caption can be a render array
+    // Also, caption can be a render array
     $captions['nid-' . $item->nid]['main_content']['#theme'] = 'item_list';
     $captions['nid-' . $item->nid]['main_content']['#items'] = array($item->title);
     $captions['nid-' . $item->nid]['main_content']['#prefix'] = '<h3>';
@@ -99,7 +98,7 @@ function nivo_slider_api_test() {
   }
 
   $options = array();
-  // add nivo slider settings
+  // Add nivo slider settings
 
   /**
    * list of evaliable effcts:
@@ -119,26 +118,25 @@ function nivo_slider_api_test() {
    *
    * @link http://dev7studios.com/nivo-slider/#/documentation some pore documentation
    */
-  // you can customize all your slider inctances by passing a slider setting
+  // You can customize all your slider inctances by passing a slider setting
   $options['settings'] = array(
-    //'effect' => "boxRainGrowReverse",
     'directionNav' => TRUE
   );
-  // also, you can use your own theme (copy from nivo-slider some theme and paste it to you module)
-  // you can chanege styles to your own needs.
+  // Also, you can use your own theme (copy from nivo-slider some theme and paste it to you module)
+  // You can chanege styles to your own needs.
   $theme_name = 'simplejstheme';
   $module_name = 'nivo_slider_api';
   $module_path = drupal_get_path('module', $module_name);
   $options['theme']['css'] = "$module_path/themes/$theme_name/$theme_name.css";
   $options['theme']['js'] = "$module_path/themes/$theme_name/$theme_name.js";
-  // name option is required
+  // Name option is required
   $options['theme']['name'] = $theme_name;
 
   return array(
     '#theme' => 'nivo_slider_api',
     '#items' => $slider_items,
     '#captions' => $captions,
-    // name of the slider. Must be unic.
+    // Name of the slider. Must be unic.
     '#name' => 'test-slider',
     '#options' => $options,
   );
@@ -183,7 +181,7 @@ function template_preprocess_nivo_slider_api(&$vars) {
     if (!isset($options['theme']['name'])) {
       throw new Exception('Theme Name option can`t be empty.');
     }
-    // add wrappers classes
+    // Add wrappers classes
     if (isset($options['theme']['name']) && !empty($options['theme']['name'])) {
       $vars['classes_array'][] = 'theme-' . $options['theme']['name'];
       $vars['classes_array'][] = 'slider-wrapper';
@@ -192,19 +190,19 @@ function template_preprocess_nivo_slider_api(&$vars) {
       drupal_add_css($options['theme']['css']);
     }
     if (isset($options['theme']['js'])) {
-      // make theme name visible in js files
+      // Make theme name visible in js files
       $default_settings['theme_name'] = $options['theme']['name'];
       drupal_add_js($options['theme']['js'], array('scope' => 'footer'));
     }
   }
-  // load default theme
+  // Load default theme
   else {
     drupal_add_css('sites/all/libraries/nivo-slider/themes/default/default.css');
   }
 
   // load library
   drupal_add_library('nivo_slider_api', 'jquery.nivo.slider');
-  // add default settings
+  // Add default settings
   $default_settings += array(
     'animSpeed' => 500,
     'captionOpacity' => 1,
@@ -263,7 +261,7 @@ function template_preprocess_nivo_slider_api(&$vars) {
     //    'lastSlide' =>  function(){},
     //    'afterLoad' =>  function(){} // Triggers when slider has loaded
   );
-  // add slider instance settings
+  // Add slider instance settings
   $settings = $default_settings;
   if (isset($options['settings']) && !empty($options['settings'])) {
     $settings = array_merge($default_settings, $options['settings']);
@@ -271,22 +269,22 @@ function template_preprocess_nivo_slider_api(&$vars) {
   $data = array('nivo_slider_api' => array($name => $settings));
   drupal_add_js($data, 'setting');
 
-  // prepare slider items
+  // Prepare slider items
   $items = $vars['items'];
-  // reset items variable
+  // Reset items variable
   $vars['items'] = array();
   foreach ($items as $item) {
     if (is_array($item)) {
-      // expecst that the $item is a render array
+      // Expecst that the $item is a render array
       $vars['items'][] = render($item);
     }
   }
   if (isset($vars['captions']) && !empty($vars['captions'])) {
     $captions = $vars['captions'];
-    // reset captions variable
+    // Reset captions variable
     $vars['captions'] = array();
     foreach ($captions as $id => $caption) {
-      // expects that the $item is a render array
+      // Expects that the $item is a render array
       if (is_array($caption)) {
         $vars['captions'][$id] = render($caption);
       }
@@ -296,7 +294,7 @@ function template_preprocess_nivo_slider_api(&$vars) {
     }
   }
 
-  // run sliders
+  // Run sliders
   $module_path = drupal_get_path('module', 'nivo_slider_api');
   drupal_add_js($module_path . '/nivo_slider_api.js');
 }

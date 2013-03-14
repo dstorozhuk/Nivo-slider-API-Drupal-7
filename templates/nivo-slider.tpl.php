@@ -1,7 +1,4 @@
 <?php
-// $Id$
-
-
 /**
  * @file nivo-slider-api-wrapper.tpl.php
  * Main slider template
@@ -23,4 +20,3 @@
       <?php endforeach; ?>
     <?php endif; ?>
 </div>
-

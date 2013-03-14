@@ -35,5 +35,3 @@ REQUIREMENTS
 nivo-slider library 3.1
 
 Why 3.1? it work well with jQuery 1.4.4 without any updates.
-
-
