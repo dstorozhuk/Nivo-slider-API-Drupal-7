@@ -1,8 +1,8 @@
 <?php
 /**
  * Main slider template
- *
  * @file nivo-slider-api-wrapper.tpl.php
+ * 
  * @see template_nivo_slider_api_wrapper_preprocess()
  */
 ?>

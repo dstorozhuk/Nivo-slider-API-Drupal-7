@@ -1,9 +1,8 @@
 <?php
 /**
- * Nivo slider API theme - is a developer theme to easy construct and output
- * the new nivo slider instance.
- *
+ * Developer theme to easy construct and output the new nivo slider instance.
  * @file sorce for nivo_slider_api module
+ *
  * @see nivo_slider_api_test() for usage example
  */
 
@@ -100,7 +99,7 @@ function nivo_slider_api_test() {
   // Add nivo slider settings.
   // You can customize all your slider inctances by passing a slider setting.
   $options['settings'] = array(
-    'directionNav' => TRUE
+    'directionNav' => TRUE,
   );
   // Also, you can use your own theme,
   // (copy from nivo-slider some theme and paste it to you module).
