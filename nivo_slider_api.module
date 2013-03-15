@@ -1,6 +1,6 @@
 <?php
 /**
- * @file sorce for nivo_slider_api module.
+ * @file nivo_slider_api.module.
  * Developer can  easy construct and output the new nivo slider instance.
  */
 
