@@ -78,7 +78,8 @@ function nivo_slider_api_test() {
         'html' => TRUE,
       ),
     );
-    // Caption item key will be a caption html element id attribute and value - content.
+    // Caption item key will be a caption html element id attribute,
+    // and value - content.
     // Example; $captions['fid-' . $item->fid] = $item->title.
     // Also, caption can be a render array.
     $captions['nid-' . $item->nid]['main_content']['#theme'] = 'item_list';
