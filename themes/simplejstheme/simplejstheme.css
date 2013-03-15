@@ -57,7 +57,9 @@
   -o-transition: all 200ms ease-in-out;
   transition: all 200ms ease-in-out;
 }
-.theme-default: hover .nivo-directionNav a { opacity: 1; }
+.theme-default:hover .nivo-directionNav a {
+  opacity: 1;
+}
 .theme-simplejstheme a.nivo-nextNav {
   background-position: -30px 0;
   right: 15px;
@@ -73,7 +75,7 @@
   color: #fff;
   border-bottom: 1px dotted #fff;
 }
-.theme-simplejstheme .nivo-caption a: hover {
+.theme-simplejstheme .nivo-caption a:hover {
   color: #fff;
 }
 
