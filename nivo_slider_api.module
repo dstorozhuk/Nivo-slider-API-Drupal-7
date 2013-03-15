@@ -76,7 +76,7 @@ function nivo_slider_api_test() {
       '#options' => array(
         // If link is image - this option always TRUE.
         'attributes' => array('title' => $title),
-        'html' => TRUE
+        'html' => TRUE,
       ),
     );
     // Caption item key will be a caption html element id attribute and value - content.
@@ -98,19 +98,19 @@ function nivo_slider_api_test() {
 
   $options = array();
   // Add nivo slider settings.
-
   // You can customize all your slider inctances by passing a slider setting.
   $options['settings'] = array(
     'directionNav' => TRUE
   );
-  // Also, you can use your own theme (copy from nivo-slider some theme and paste it to you module).
+  // Also, you can use your own theme,
+  // (copy from nivo-slider some theme and paste it to you module).
   // You can chanege styles to your own needs.
   $theme_name = 'simplejstheme';
   $module_name = 'nivo_slider_api';
   $module_path = drupal_get_path('module', $module_name);
   $options['theme']['css'] = "$module_path/themes/$theme_name/$theme_name.css";
   $options['theme']['js'] = "$module_path/themes/$theme_name/$theme_name.js";
-  // Name option is required
+  // Name option is required.
   $options['theme']['name'] = $theme_name;
 
   return array(
@@ -181,7 +181,7 @@ function template_preprocess_nivo_slider_api(&$vars) {
     drupal_add_css('sites/all/libraries/nivo-slider/themes/default/default.css');
   }
 
-  // load library.
+  // Load library.
   drupal_add_library('nivo_slider_api', 'jquery.nivo.slider');
   // Add default settings.
   $default_settings += array(
