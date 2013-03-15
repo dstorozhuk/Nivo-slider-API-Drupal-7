@@ -1,9 +1,7 @@
 <?php
 /**
- * Developer theme to easy construct and output the new nivo slider instance.
- * @file sorce for nivo_slider_api module
- *
- * @see nivo_slider_api_test() for usage example
+ * @file sorce for nivo_slider_api module.
+ * Developer can  easy construct and output the new nivo slider instance.
  */
 
 
