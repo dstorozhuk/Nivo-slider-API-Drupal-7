@@ -1,8 +1,9 @@
 <?php
 
 /**
- * @file nivo-slider-api-wrapper.tpl.php
+ * @file
  * Main slider template.
+ *
  * Variables available:
  * - $classes : class attribute.
  * - $name : the slider machine name.
