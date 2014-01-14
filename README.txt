@@ -1,8 +1,8 @@
 DESCRIPTION
 
 Nivo slider API theme - is a developer theme to easy construct and output
-the new nivo slider instance. It hasn't any UI, so you are responsible to creating
-and outputting the slider.
+the new nivo slider instance. It hasn't any UI, so you are responsible to
+creating and outputting the slider.
 
 USAGE
 

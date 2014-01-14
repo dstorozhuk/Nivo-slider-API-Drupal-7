@@ -1,12 +1,13 @@
 <?php
+
 /**
  * @file nivo-slider-api-wrapper.tpl.php
- * Main slider template
- * 
- * - $classes : 
- * - $name : 
- * - $items : 
- * - $captions :
+ * Main slider template.
+ * Variables available:
+ * - $classes : class attribute.
+ * - $name : the slider machine name.
+ * - $items : slides items (images).
+ * - $captions : slide images captions.
  * @see template_nivo_slider_api_wrapper_preprocess()
  */
 ?>
