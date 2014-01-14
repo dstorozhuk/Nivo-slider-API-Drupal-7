@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @file nivo_slider_api.module.
+ * @file
  * Drupal hooks and global API functions to build nivo slider instance.
  *
  * This module provide ability for developer to easy construct and output the
