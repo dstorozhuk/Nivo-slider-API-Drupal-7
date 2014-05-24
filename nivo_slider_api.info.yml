@@ -1,0 +1,7 @@
+type: module
+configure: nivo.slider.admin
+name: Nivo Slider API
+
+description: Provide easy way to create nivo sliders in your code.
+core: 8.x
+package: API

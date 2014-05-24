@@ -1,0 +1,7 @@
+nivo.slider.test:
+  path: '/nivo-test'
+  defaults:
+    _content: '\Drupal\nivo_slider_api\Controller\NivoSliderApiController::adminOverview'
+    _title: 'nivo test'
+  requirements:
+    _permission: 'administer site configuration'

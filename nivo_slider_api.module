@@ -16,11 +16,11 @@
  */
 function nivo_slider_api_menu() {
   $items = array();
-  $items['nivo-slider-api-test'] = array(
-    'title' => 'nivo_slider_api',
+  $items['nivo.slider.test'] = array(
+    'title' => 'nivo slider api',
     'description' => 'nivo_slider_api_test',
-    'page callback' => 'nivo_slider_api_test',
-    'access arguments' => array('administer site configuration'),
+    //'page callback' => 'nivo_slider_api_test',
+    //'access arguments' => array('administer site configuration'),
     'menu_name' => 'Navigation',
     'type' => MENU_NORMAL_ITEM,
   );
