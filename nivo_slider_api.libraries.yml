@@ -1,0 +1,9 @@
+jquery.nivo.slider:
+  remote: http://dev7studios.com/nivo-slider
+  version: 3.1
+  js:
+    /libraries/nivo-slider/jquery.nivo.slider.pack.js: {}
+  css:
+    /libraries/nivo-slider/nivo-slider.css: {}
+  dependencies:
+    - core/jquery
