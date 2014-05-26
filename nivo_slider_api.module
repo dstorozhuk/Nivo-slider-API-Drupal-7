@@ -36,23 +36,24 @@ function nivo_slider_api_menu() {
 function nivo_slider_api_test() {
   // Load test data.
   $field_name = 'field_image';
-  if (!field_info_field($field_name)) {
+  if (!field_info_field('node', $field_name)) {
     return t('There is no field with !name', array('!name' => $field_name));
   }
 
-  $query = new EntityFieldQuery();
-  $query->entityCondition('entity_type', 'node');
-  $query->propertyCondition('status', 1);
-  $query->fieldCondition($field_name, 'fid', 'NULL', '!=');
-  $query->range(0, 15);
+  $query = \Drupal::entityQuery('node');
+    $query->condition('status', 1)
+    ->condition($field_name, '', '!=');
+  $result = $query
+    ->range(0, 15)
+    ->execute();
 
-  $result = $query->execute();
   $nodes = array();
-  if (isset($result['node'])) {
-    $nids = array_keys($result['node']);
-    $nodes = node_load_multiple($nids);
+
+  if (empty($result)) {
+    $nodes = node_load_multiple($result);
   }
 
+  return 'test';
   // Init vars.
   $captions = array();
   $slider_items = array();
