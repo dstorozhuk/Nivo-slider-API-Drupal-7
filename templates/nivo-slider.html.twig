@@ -1,16 +1,14 @@
-<div class="{{ classes  }}">
+<div class="{{ s }}">
   <div id="{{ name  }}" class="nivo-slider-api clearfix">
       {% for item in items %}
         {{ item }}
       {% endfor %}
     </div>
     {% if captions %}
-      {%  for caption in captions %}
-        <div id="{{ loop.index  }}" class="nivo-html-caption">
+      {%  for key, caption in captions %}
+        <div id="{{ key }}" class="nivo-html-caption">
           {{ caption }}
         </div>
       {% endfor %}
     {% endif %}
 </div>
-
-{{ classes  }}
