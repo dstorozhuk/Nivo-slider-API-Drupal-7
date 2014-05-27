@@ -24,9 +24,9 @@ INSTALATION
   http://www.jsdelivr.com/#!nivoslider
 
   The slider library must be placed here:
-    /sites/all/libraries/nivo-slider
+    /libraries/nivo-slider/
   So, the full path to .js file is
-    /sites/all/libraries/nivo-slider/jquery.nivo.slider.pack.js
+    /libraries/nivo-slider/jquery.nivo.slider.pack.js
 2. Copy module and enable as usually
 3. Finish! Use theme 'nivo_slider_api' in your code.
 

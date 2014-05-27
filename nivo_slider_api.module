@@ -19,8 +19,6 @@ function nivo_slider_api_menu() {
   $items['nivo.slider.test'] = array(
     'title' => 'nivo slider api',
     'description' => 'nivo_slider_api_test',
-    //'page callback' => 'nivo_slider_api_test',
-    //'access arguments' => array('administer site configuration'),
     'menu_name' => 'Navigation',
     'type' => MENU_NORMAL_ITEM,
   );
@@ -136,13 +134,6 @@ function nivo_slider_api_theme($existing, $type, $theme, $path) {
     'nivo_slider_api' => array(
       'template' => 'nivo-slider',
       'render element' => 'elements',
-//      'variables' => array(
-//        'items' => array(),
-//        'captions' => array(),
-//        'options' => array(),
-//        'name' => NULL,
-//        'attributes' => array()
-//      ),
     ),
   );
 }
@@ -152,13 +143,12 @@ function nivo_slider_api_theme($existing, $type, $theme, $path) {
  */
 function template_preprocess_nivo_slider_api(&$vars) {
   $options = $vars['elements']['#options'];
-  $captions = $vars['elements']['#captions'];
-  dpm($vars['elements'], '$vars[\'elements\']');
+
   if (!isset($vars['elements']['#name'])) {
     // Name option can`t be empty.
     return;
   }
-  dpm($vars);
+
   $name = $vars['elements']['#name'];
   $vars['name'] = $name;
   $vars['attributes'] = array('class' => '');
@@ -186,7 +176,7 @@ function template_preprocess_nivo_slider_api(&$vars) {
   else {
     _drupal_add_css('sites/all/libraries/nivo-slider/themes/default/default.css');
   }
-  dpm($default_settings);
+
   // Load library.
   _drupal_add_library('nivo_slider_api/jquery.nivo.slider');
   // Add default settings.
@@ -214,7 +204,7 @@ function template_preprocess_nivo_slider_api(&$vars) {
     $settings = array_merge($default_settings, $options['settings']);
   }
   $data = array('nivo_slider_api' => array($name => $settings));
-  dpm($data, '$data');
+
   _drupal_add_js($data, 'setting');
 
   // Prepare slider items.
@@ -244,9 +234,8 @@ function template_preprocess_nivo_slider_api(&$vars) {
 
   // Run sliders.
   $vars['attributes'] = new Attribute($vars['attributes']);
-  //$vars['attributes'] = $vars['attributes']->__toString();
-  $vars['s'] = $vars['attributes']->__toString();
-  //dpm($vars, '$vars');
+  $vars['wrapper_attributes'] = $vars['attributes']->__toString();
+
   $module_path = drupal_get_path('module', 'nivo_slider_api');
   _drupal_add_js($module_path . '/nivo_slider_api.js', array('scope' => 'footer', 'weight' => 0));
 }
