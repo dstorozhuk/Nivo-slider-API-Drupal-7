@@ -29,7 +29,7 @@ function nivo_slider_api_menu() {
 /**
  * Example page how to use nivo_slider_api theme.
  *
- * @todo remove in non-dev version
+ * @todo remove in stable version.
  */
 function nivo_slider_api_test() {
   // Load test data.
@@ -51,22 +51,23 @@ function nivo_slider_api_test() {
     $nodes = node_load_multiple($result);
   }
 
-  //return 'test';
   // Init vars.
   $captions = array();
   $slider_items = array();
-  //dpm($nodes);
-  //return 'asd';
+
   foreach ($nodes as $item) {
-    $title = $item->getName();
+    $title = $item->label();
     // Build images.
     $image = array(
       '#theme' => 'image_style',
       '#uri' => $item->field_image->entity->getFileUri(),
-//      '#alt' => $title,
+      '#alt' => $title,
       // Associate slider item with caption item.
       '#title' => '#nid-' . $item->id(),
-      '#style_name' => 'large',
+      '#attributes' => array(
+        'title' => $title
+      ),
+      '#style_name' => 'medium',
     );
     // Wrapp images to links.
     $slider_items[] = array(
@@ -122,7 +123,13 @@ function nivo_slider_api_test() {
     // Name of the slider. Must be unic.
     '#name' => 'test-slider',
     '#options' => $options,
-    //'#attached' =>
+    '#attached' => array(
+      'css' => array(
+        '.nivo-slider-api-wrapper{width:500px;}' => array(
+          'type' => 'inline'
+        )
+      )
+    )
   );
 }
 
@@ -213,7 +220,7 @@ function template_preprocess_nivo_slider_api(&$vars) {
   $vars['items'] = array();
   foreach ($items as $item) {
     if (is_array($item)) {
-      // Expecst that the $item is a render array.
+      // Expect that the $item is a render array.
       $vars['items'][] = render($item);
     }
   }
@@ -232,10 +239,9 @@ function template_preprocess_nivo_slider_api(&$vars) {
     }
   }
 
-  // Run sliders.
   $vars['attributes'] = new Attribute($vars['attributes']);
   $vars['wrapper_attributes'] = $vars['attributes']->__toString();
-
+  // Add the "run" script.
   $module_path = drupal_get_path('module', 'nivo_slider_api');
   _drupal_add_js($module_path . '/nivo_slider_api.js', array('scope' => 'footer', 'weight' => 0));
 }
